@@ -1,6 +1,9 @@
 package com.zxl.parseq.test;
 
+import java.util.List;
 import java.util.concurrent.Callable;
+
+import org.slf4j.Logger;
 
 import com.linkedin.parseq.BaseTask;
 import com.linkedin.parseq.Context;
@@ -20,17 +23,22 @@ import com.ning.http.client.Response;
  * @create 2013-5-16 下午8:10:59
  */
 public class Test2 {
-
+	private static Logger log = org.slf4j.LoggerFactory.getLogger(Test2.class);
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) { 
 		// TODO Auto-generated method stub
-		final Task<String> googleContentType = getContentType("http://www.google.com");
+		final Task<String> googleContentType = getContentType("http://www.baidu.com");
 		final Task<String> bingContentType = getContentType("http://www.bing.com");
 		final Task<String> yahooContentType = getContentType("http://www.yahoo.com");
-		final ParTask<?> fetchContentTypes = Tasks.par(googleContentType, bingContentType, yahooContentType);
+		final ParTask<String> fetchContentTypes = Tasks.par(googleContentType, bingContentType, yahooContentType);
 		
+		List<String> list = fetchContentTypes.getSuccessful();
+		
+		for(String content: list){
+			log.debug(content);
+		}
 		
 	}
 
@@ -60,7 +68,6 @@ public class Test2 {
 				// Sequence the tasks
 				final Task<String> plan = Tasks.seq(httpResponse, contentType);
 				context.run(plan);
-
 				return plan;
 			}
 		};
